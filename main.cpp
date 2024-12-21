@@ -3,6 +3,9 @@
 #include <sstream> 
 using namespace std;
 
+
+// STRUCTS
+
 struct Process {
     char name;
     int arrivalTime;
@@ -11,13 +14,14 @@ struct Process {
 
 struct InputData { 
     string mode;
-    vector<string> algorithms;
+    vector<pair<int, int>> algorithms;
     int endTime;
     int numberOfProcesses;
     vector<Process> processes;
 
 };
 
+// HELPER FUNCTIONS
 
 //split function taken from the internet :)))
 vector<string> split(const string &str, char delimiter) {
@@ -30,13 +34,31 @@ vector<string> split(const string &str, char delimiter) {
     return tokens;
 }
 
+void process_algorithms(const vector<string>& algorithm_tokens, vector<pair<int, int>>& algorithms) {
+    for (const auto& policy : algorithm_tokens) {
+        size_t dash_pos = policy.find('-');
+        if (dash_pos != string::npos) {
+            // for roundrobin and aging only
+            int policy_number = stoi(policy.substr(0, dash_pos));
+            int q_value = stoi(policy.substr(dash_pos + 1));
+            algorithms.push_back({policy_number, q_value});
+        } else {
+            // otherwise -1
+            int policy_number = stoi(policy);
+            algorithms.push_back({policy_number, -1});
+        }
+    }
+}
+
+
 InputData read_input() {
     InputData input_;
     cin >> input_.mode;
     
     string all_algorithms;
     cin >> all_algorithms;
-    input_.algorithms = split(all_algorithms, ',');
+    vector<string> alg_tokens = split(all_algorithms, ',');
+    process_algorithms(alg_tokens, input_.algorithms);
 
     cin >> input_.endTime;
     cin >> input_.numberOfProcesses;
@@ -69,8 +91,9 @@ int main() {
     cout << "Mode: " << input_d.mode << "\n";
     cout << "Policies: ";
     for (const auto &policy : input_d.algorithms) {
-        cout << policy << " ";
+        cout << "(" << policy.first << ", " << policy.second << ") ";
     }
+    cout << "\n";
     cout << "\nLast Instant: " << input_d.endTime << "\n";
     cout << "Number of Processes: " << input_d.numberOfProcesses << "\n";
 
