@@ -4,6 +4,7 @@
 #include <string.h>
 #include <algorithm>
 #include <iomanip>
+#include <queue>
 //#include "modes.h"
 //#include "FCFS.h"
 //#include "SPN.h"
@@ -89,39 +90,39 @@ InputData read_input() {
 }
 
 void trace(char* res, std::string mode, int endtime,std::vector<Process> processes){
-    std::cout<<mode<<std::setw(3);
+    cout<<mode<<std::setw(3);
     for (int i=0; i<=endtime;i++){
-        std::cout<<i%10<<" ";
+        cout<<i%10<<" ";
     }
-    std::cout<<"\n";
+    cout<<"\n";
     for(int i=0; i<= endtime*2 +6;i++){
-        std::cout<<"-";
+        cout<<"-";
     }
-    std::cout<<"\n";
+    cout<<"\n";
     for(int j=0;j<size(processes);j++){
-        std::cout<<processes.at(j).name<<std::setw(6);
+        cout<<processes.at(j).name<<std::setw(6);
         for(int i=0; i<endtime;i++){
-            std::cout<<"|";
+            cout<<"|";
             if(i<processes.at(j).arrivalTime)
-            std::cout<<" ";
+            cout<<" ";
             else if(res[i]==processes.at(j).name)
-            std::cout<<"*";
+            cout<<"*";
             else if(i<processes.at(j).leaveTime && res[i]!=processes.at(j).name)
-            std::cout<<".";
+            cout<<".";
             else if(i>=processes.at(j).leaveTime)
-            std::cout<<" ";
+            cout<<" ";
 
         }
-        std::cout<<"|\n";
+        cout<<"|\n";
     }
     for(int i=0; i<= endtime*2 +6;i++){
-        std::cout<<"-";
+        cout<<"-";
     }
 }
 
 
 void stats(char* res, std::string mode, int endtime,std::vector<Process> processes){
-    std::cout<<"stats";
+    cout<<"stats";
 }
 
 char* FCFS(std::vector<Process> &processes, int endtime){
@@ -147,7 +148,60 @@ char* FCFS(std::vector<Process> &processes, int endtime){
 
 char* SPN(std::vector<Process> &processes, int endtime){
     char* times = new char[endtime];
-
+    sort(processes.begin(), processes.end(), [](const Process& a, const Process& b) {
+        return a.third_attribute < b.third_attribute;
+    }); //from internet 
+    queue<Process*> smallbuthaventarrived; 
+    int count = 0;
+    for (int i=0; i<size(processes);i++){
+        if (count>endtime)
+        break;
+        if(processes.at(i).arrivalTime>count)
+        {smallbuthaventarrived.push(&processes.at(i));}
+        while(!smallbuthaventarrived.empty())
+            {
+                if(smallbuthaventarrived.front()->arrivalTime<=count)
+                {
+                    for(int j=0; j<smallbuthaventarrived.front()->third_attribute; j++)
+                    {
+                    times[count] = smallbuthaventarrived.front()->name;
+                    count++;
+                    }
+                smallbuthaventarrived.front()->leaveTime = count;
+                smallbuthaventarrived.pop();
+                }
+                else
+                break;
+            }
+        if(processes.at(i).arrivalTime<=count){
+            for(int j=0; j<processes.at(i).third_attribute; j++){
+                times[count] = processes.at(i).name;
+                count++;
+            }
+            processes.at(i).leaveTime = count;
+        }
+    }
+    while(!smallbuthaventarrived.empty())
+        {
+            if(smallbuthaventarrived.front()->arrivalTime<=count)
+            {
+                for(int j=0; j<smallbuthaventarrived.front()->third_attribute; j++)
+                {
+                times[count] = smallbuthaventarrived.front()->name;
+                count++;
+                }
+            smallbuthaventarrived.front()->leaveTime = count;
+            smallbuthaventarrived.pop();
+            }
+            else
+            {
+            times[count] = 0;
+            count++;
+            }
+        }
+    sort(processes.begin(), processes.end(), [](const Process& a, const Process& b) {
+        return a.arrivalTime < b.arrivalTime;
+    });
     return times;
 }
 
