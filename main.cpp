@@ -1,15 +1,22 @@
 #include <iostream>
 #include <vector>
 #include <sstream> 
+#include <string.h>
+#include <algorithm>
+#include <iomanip>
+//#include "modes.h"
+//#include "FCFS.h"
+//#include "SPN.h"
 using namespace std;
 
 
-// STRUCTS
+//STRUCTS
 
 struct Process {
     char name;
     int arrivalTime;
     int third_attribute; //priority for aging, service time otherwise
+    int leaveTime;
 };
 
 struct InputData { 
@@ -81,7 +88,68 @@ InputData read_input() {
     return input_;
 }
 
+void trace(char* res, std::string mode, int endtime,std::vector<Process> processes){
+    std::cout<<mode<<std::setw(3);
+    for (int i=0; i<=endtime;i++){
+        std::cout<<i%10<<" ";
+    }
+    std::cout<<"\n";
+    for(int i=0; i<= endtime*2 +6;i++){
+        std::cout<<"-";
+    }
+    std::cout<<"\n";
+    for(int j=0;j<size(processes);j++){
+        std::cout<<processes.at(j).name<<std::setw(6);
+        for(int i=0; i<endtime;i++){
+            std::cout<<"|";
+            if(i<processes.at(j).arrivalTime)
+            std::cout<<" ";
+            else if(res[i]==processes.at(j).name)
+            std::cout<<"*";
+            else if(i<processes.at(j).leaveTime && res[i]!=processes.at(j).name)
+            std::cout<<".";
+            else if(i>=processes.at(j).leaveTime)
+            std::cout<<" ";
 
+        }
+        std::cout<<"|\n";
+    }
+    for(int i=0; i<= endtime*2 +6;i++){
+        std::cout<<"-";
+    }
+}
+
+
+void stats(char* res, std::string mode, int endtime,std::vector<Process> processes){
+    std::cout<<"stats";
+}
+
+char* FCFS(std::vector<Process> &processes, int endtime){
+
+    char* times = new char[endtime];
+    sort(processes.begin(), processes.end(), [](const Process& a, const Process& b) {
+        return a.arrivalTime < b.arrivalTime;
+    }); //from internet .. i think homa given sorted by arrival?
+    int count = 0;
+    for (int i=0; i<size(processes);i++){
+        if (count>endtime)
+        break;
+        if(processes.at(i).arrivalTime<=count){
+            for(int j=0; j<processes.at(i).third_attribute; j++){
+                times[count] = processes.at(i).name;
+                count++;
+            }
+            processes.at(i).leaveTime = count;
+        }
+    }
+    return times;
+}
+
+char* SPN(std::vector<Process> &processes, int endtime){
+    char* times = new char[endtime];
+
+    return times;
+}
 
 int main() {
 
@@ -103,5 +171,43 @@ int main() {
              << ", Service=" << process.third_attribute << "\n";
     }
 
+    for (int i =0; i<size(input_d.algorithms); i++){
+        switch(input_d.algorithms.at(i).first){
+        case(1):
+        {
+            char* res = FCFS(input_d.processes, input_d.endTime);
+            if (input_d.mode.compare("trace") == 0){
+                trace(res,"FCFS",input_d.endTime,input_d.processes);
+            }
+            else if(input_d.mode.compare("stats") == 0){
+                stats(res,"FCFS",input_d.endTime,input_d.processes);
+            }
+            break;
+        }
+        case(2):
+        case(3):        
+        {
+            char* res = SPN(input_d.processes, input_d.endTime);
+            if (input_d.mode.compare("trace") == 0){
+                trace(res,"SPN",input_d.endTime,input_d.processes);
+            }
+            else if(input_d.mode.compare("stats") == 0){
+                stats(res,"SPN",input_d.endTime,input_d.processes);
+            }
+
+            break;
+        }
+        case(4):
+        case(5):
+        case(6):
+        case(7):
+        case(8):
+        default:
+        {
+            cout<<"Invalid algorithm";
+        }
+    }
+    }
     return 0;
+
 }
