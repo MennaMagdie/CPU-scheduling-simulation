@@ -1,32 +1,15 @@
-#include <iostream>
-#include <vector>
-#include <sstream> 
-#include <string.h>
-#include <algorithm>
-#include <iomanip>
-#include <queue>
-//#include "modes.h"
-//#include "FCFS.h"
-//#include "SPN.h"
-using namespace std;
+#include "structs.h" // for processes and input data
+#include "algorithms/round_robin.h"
 
-
-//STRUCTS
-
-struct Process {
-    char name;
-    int arrivalTime;
-    int third_attribute; //priority for aging, service time otherwise
-    int leaveTime;
-};
-
-struct InputData { 
-    string mode;
-    vector<pair<int, int>> algorithms;
-    int endTime;
-    int numberOfProcesses;
-    vector<Process> processes;
-
+enum Algorithm {
+    ALG_FCFS = 1,
+    ALG_RR,
+    ALG_SPN,
+    ALG_SRT, 
+    ALG_HRRN,
+    ALG_FB1,
+    ALG_FB2I,
+    ALG_AGING
 };
 
 // HELPER FUNCTIONS
@@ -89,8 +72,8 @@ InputData read_input() {
     return input_;
 }
 
-void trace(char* res, std::string mode, int endtime,std::vector<Process> processes){
-    cout<<mode<<std::setw(3);
+void trace(char* res, string mode, int endtime,vector<Process> processes){
+    cout<<mode<<setw(3);
     for (int i=0; i<=endtime;i++){
         cout<<i%10<<" ";
     }
@@ -100,7 +83,7 @@ void trace(char* res, std::string mode, int endtime,std::vector<Process> process
     }
     cout<<"\n";
     for(int j=0;j<size(processes);j++){
-        cout<<processes.at(j).name<<std::setw(6);
+        cout<<processes.at(j).name<<setw(6);
         for(int i=0; i<endtime;i++){
             cout<<"|";
             if(i<processes.at(j).arrivalTime)
@@ -121,11 +104,15 @@ void trace(char* res, std::string mode, int endtime,std::vector<Process> process
 }
 
 
-void stats(char* res, std::string mode, int endtime,std::vector<Process> processes){
+void stats(char* res, string mode, int endtime, vector<Process> processes){
     cout<<"stats";
 }
 
-char* FCFS(std::vector<Process> &processes, int endtime){
+
+
+/* POLICIES */
+
+char* FCFS(vector<Process> &processes, int endtime){
 
     char* times = new char[endtime];
     sort(processes.begin(), processes.end(), [](const Process& a, const Process& b) {
@@ -146,7 +133,7 @@ char* FCFS(std::vector<Process> &processes, int endtime){
     return times;
 }
 
-char* SPN(std::vector<Process> &processes, int endtime){
+char* SPN(vector<Process> &processes, int endtime){
     char* times = new char[endtime];
     sort(processes.begin(), processes.end(), [](const Process& a, const Process& b) {
         return a.third_attribute < b.third_attribute;
@@ -205,31 +192,40 @@ char* SPN(std::vector<Process> &processes, int endtime){
     return times;
 }
 
+
 int main() {
 
     InputData input_d = read_input();
 
     //for debugging purposes
-    cout << "Mode: " << input_d.mode << "\n";
-    cout << "Policies: ";
-    for (const auto &policy : input_d.algorithms) {
-        cout << "(" << policy.first << ", " << policy.second << ") ";
-    }
-    cout << "\n";
-    cout << "\nLast Instant: " << input_d.endTime << "\n";
-    cout << "Number of Processes: " << input_d.numberOfProcesses << "\n";
+    // cout << "Mode: " << input_d.mode << "\n";
+    // cout << "Policies: ";
+    // for (const auto &policy : input_d.algorithms) {
+    //     cout << "(" << policy.first << ", " << policy.second << ") ";
+    // }
+    // cout << "\n";
+    // cout << "\nLast Instant: " << input_d.endTime << "\n";
+    // cout << "Number of Processes: " << input_d.numberOfProcesses << "\n";
 
-    for (const auto &process : input_d.processes) {
-        cout << "Process " << process.name
-             << ": Arrival=" << process.arrivalTime
-             << ", Service=" << process.third_attribute << "\n";
-    }
+    // for (const auto &process : input_d.processes) {
+    //     cout << "Process " << process.name
+    //          << ": Arrival=" << process.arrivalTime
+    //          << ", Service=" << process.third_attribute << "\n";
+    // }
+
+    vector<Process> originalProcesses = input_d.processes; 
+    char* res = nullptr; 
 
     for (int i =0; i<size(input_d.algorithms); i++){
-        switch(input_d.algorithms.at(i).first){
-        case(1):
+
+        input_d.processes = originalProcesses;
+
+        Algorithm algo = static_cast<Algorithm>(input_d.algorithms.at(i).first);
+        switch(algo){
+
+        case ALG_FCFS:
         {
-            char* res = FCFS(input_d.processes, input_d.endTime);
+            res = FCFS(input_d.processes, input_d.endTime);
             if (input_d.mode.compare("trace") == 0){
                 trace(res,"FCFS",input_d.endTime,input_d.processes);
             }
@@ -238,10 +234,21 @@ int main() {
             }
             break;
         }
-        case(2):
-        case(3):        
+        case ALG_RR:
+
+            res = roundRobin(input_d.processes, input_d.endTime, input_d.algorithms.at(i).second);
+            if (input_d.mode.compare("trace") == 0){
+                trace(res,"RR",input_d.endTime,input_d.processes);
+            }
+            else if(input_d.mode.compare("stats") == 0){
+                stats(res,"RR",input_d.endTime,input_d.processes);
+            }
+            cout << "rr not implemented yet";
+            break;
+
+        case ALG_SPN:        
         {
-            char* res = SPN(input_d.processes, input_d.endTime);
+            res = SPN(input_d.processes, input_d.endTime);
             if (input_d.mode.compare("trace") == 0){
                 trace(res,"SPN",input_d.endTime,input_d.processes);
             }
@@ -251,15 +258,23 @@ int main() {
 
             break;
         }
-        case(4):
-        case(5):
-        case(6):
-        case(7):
-        case(8):
+        case ALG_SRT:
+            cout << "srt not implemented yet";
+            break;
+        case ALG_HRRN:
+            cout << "hrrn not implemented yet";
+            break;
+        case ALG_FB1:
+            cout << "fb1 not implemented yet";
+            break;
+        case ALG_FB2I:
+            cout << "fb2i not implemented yet";
+            break;
+        case ALG_AGING:
+            cout << "aging not implemented yet";
+            break;
         default:
-        {
             cout<<"Invalid algorithm";
-        }
     }
     }
     return 0;
