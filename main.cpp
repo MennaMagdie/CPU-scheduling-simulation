@@ -74,7 +74,7 @@ InputData read_input() {
 }
 
 void trace(char* res, string mode, int endtime,vector<Process> processes){
-    cout<<mode<<setw(3);
+    cout<<mode<<setw(4);
     for (int i=0; i<=endtime;i++){
         cout<<i%10<<" ";
     }

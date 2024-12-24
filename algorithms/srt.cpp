@@ -7,7 +7,7 @@ bool compareByRemainingTime(Process* a, Process* b) {
 
 char* shortestRemainingTime(vector<Process>& processes, int endTime) {
 
-    cout << "helloooo" << endl;
+    // cout << "helloooo" << endl;
     char* times = new char[endTime];
     memset(times, '_', endTime); //for idle :)
 
@@ -15,7 +15,7 @@ char* shortestRemainingTime(vector<Process>& processes, int endTime) {
     Process* currentProcess = nullptr;
 
     while (currentTime < endTime) {
-        cout << "helloooo" << endl;
+        // cout << "helloooo" << endl;
         // add on arrival
         vector<Process*> readyProcesses;
         // most probably elmoshkela hena
@@ -30,7 +30,7 @@ char* shortestRemainingTime(vector<Process>& processes, int endTime) {
             for (auto* process : readyProcesses) {
                 if (process->third_attribute < shortest->third_attribute) {
                     shortest = process;
-                    cout << shortest->name << " heyya elshortest nowww" << endl;
+                    // cout << shortest->name << " heyya elshortest nowww" << endl;
                 }
             }
             currentProcess = shortest;
