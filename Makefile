@@ -15,3 +15,5 @@
 
 
 
+# g++ -o main main.cpp algorithms/round_robin.cpp algorithms/srt.cpp
+

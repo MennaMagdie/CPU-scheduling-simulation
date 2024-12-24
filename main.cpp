@@ -1,5 +1,6 @@
 #include "structs.h" // for processes and input data
 #include "algorithms/round_robin.h"
+#include "algorithms/srt.h"
 
 enum Algorithm {
     ALG_FCFS = 1,
@@ -198,6 +199,7 @@ int main() {
     InputData input_d = read_input();
 
     //for debugging purposes
+
     // cout << "Mode: " << input_d.mode << "\n";
     // cout << "Policies: ";
     // for (const auto &policy : input_d.algorithms) {
@@ -238,10 +240,11 @@ int main() {
 
             res = roundRobin(input_d.processes, input_d.endTime, input_d.algorithms.at(i).second);
             if (input_d.mode.compare("trace") == 0){
-                trace(res,"RR",input_d.endTime,input_d.processes);
+                //REMEMBER change the quantum lol
+                trace(res,"RR-1",input_d.endTime,input_d.processes);
             }
             else if(input_d.mode.compare("stats") == 0){
-                stats(res,"RR",input_d.endTime,input_d.processes);
+                stats(res,"RR-1",input_d.endTime,input_d.processes);
             }
             cout << "rr not implemented yet";
             break;
@@ -259,7 +262,13 @@ int main() {
             break;
         }
         case ALG_SRT:
-            cout << "srt not implemented yet";
+            res = shortestRemainingTime(input_d.processes, input_d.endTime);
+            if (input_d.mode.compare("trace") == 0){
+                trace(res,"SRT",input_d.endTime, input_d.processes);
+            }
+            else if(input_d.mode.compare("stats") == 0){
+                stats(res,"SRT",input_d.endTime, input_d.processes);
+            }
             break;
         case ALG_HRRN:
             cout << "hrrn not implemented yet";
