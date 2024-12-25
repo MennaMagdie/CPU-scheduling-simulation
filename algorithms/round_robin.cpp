@@ -1,39 +1,61 @@
 #include "round_robin.h"
-#include <queue>
-#include <cstring>
 
 char* roundRobin(vector<Process>& processes, int endTime, int quantum) {
     char* times = new char[endTime];
-    memset(times, '_', endTime); 
+    memset(times, '_', endTime);
 
     queue<Process*> readyQueue;
     int currentTime = 0;
+    Process* currentProcess = nullptr;
+    Process* oldProcess = nullptr;
 
     while (currentTime < endTime) {
+        // Check for new arrivals
         for (auto& process : processes) {
             if (process.arrivalTime == currentTime) {
                 readyQueue.push(&process);
             }
         }
 
+        // Re-add the old process if it has remaining time
+        if (oldProcess != nullptr && oldProcess->third_attribute > 0) {
+            readyQueue.push(oldProcess);
+            oldProcess = nullptr;
+        }
+
+        // If there's a process in the queue, execute it
         if (!readyQueue.empty()) {
-            Process* currentProcess = readyQueue.front();
+            currentProcess = readyQueue.front();
             readyQueue.pop();
 
             int executionTime = min(quantum, currentProcess->third_attribute);
+
             for (int i = 0; i < executionTime && currentTime < endTime; ++i) {
-                times[currentTime++] = currentProcess->name;
+                // Update timeline
+                times[currentTime] = currentProcess->name;
+
+                // Increment current time and check for new arrivals
+                ++currentTime;
+                for (auto& process : processes) {
+                    if (process.arrivalTime == currentTime) {
+                        readyQueue.push(&process);
+                    }
+                }
             }
 
-            currentProcess->third_attribute -= executionTime; 
+            // Update the remaining time for the current process
+            currentProcess->third_attribute -= executionTime;
 
             if (currentProcess->third_attribute > 0) {
-                readyQueue.push(currentProcess);
+                // Re-add process to the queue if not finished
+                oldProcess = currentProcess;
             } else {
-                currentProcess->leaveTime = currentTime; 
+                // Set leave time for the finished process
+                currentProcess->leaveTime = currentTime;
             }
         } else {
-            currentTime++;
+            // If no process is ready, increment time (idle)
+            times[currentTime++] = '_';
         }
     }
 

@@ -91,13 +91,17 @@ InputData read_input() {
     return input_;
 }
 
-void trace(char* res, string mode, int endtime,vector<Process> processes){
-    cout<<mode<<setw(4);
+void trace(char* res, string mode, int endtime,vector<Process> processes, int quantum){
+    if(!quantum)
+        cout<<mode<<setw(3);
+    else
+        cout<<mode<<"-"<<quantum<<setw(3);
+    
     for (int i=0; i<=endtime;i++){
         cout<<i%10<<" ";
     }
     cout<<"\n";
-    for(int i=0; i<= endtime*2 +6;i++){
+    for(int i=0; i<= endtime*2 +7;i++){
         cout<<"-";
     }
     cout<<"\n";
@@ -117,13 +121,14 @@ void trace(char* res, string mode, int endtime,vector<Process> processes){
         }
         cout<<"|\n";
     }
-    for(int i=0; i<= endtime*2 +6;i++){
+    for(int i=0; i<= endtime*2 +7;i++){
         cout<<"-";
     }
+    cout << endl << endl;
 }
 
 
-void stats(char* res, string mode, int endtime, vector<Process> processes) {
+void stats(char* res, string mode, int endtime, vector<Process> processes, int quantum) {
     int n = processes.size();
     vector<int> finishTime(n, -1);
     vector<int> turnaroundTime(n, 0);
@@ -147,7 +152,10 @@ void stats(char* res, string mode, int endtime, vector<Process> processes) {
         totalNormTurnaround += normTurnaroundTime[i];
     }
 
-    cout << mode << endl;
+    if(!quantum)
+        cout << mode << endl;
+    else
+        cout << mode << "-" << quantum << endl;
     cout << "Process    |";
     for (const auto& p : processes) cout << "  " << p.name << "  |";
     cout << endl;
@@ -265,7 +273,6 @@ int main() {
 
     // cout << input_d.processes.at(3).third_attribute << endl; //working well LOL
 
-
     // UNCOMMENT THIS FOR DEBUGGING
     // debugInput(input_d);
 
@@ -283,10 +290,10 @@ int main() {
         {
             res = FCFS(input_d.processes, input_d.endTime);
             if (input_d.mode.compare("trace") == 0){
-                trace(res,"FCFS",input_d.endTime,input_d.processes);
+                trace(res,"FCFS",input_d.endTime,input_d.processes, 0);
             }
             else if(input_d.mode.compare("stats") == 0){
-                stats(res,"FCFS",input_d.endTime,input_d.processes);
+                stats(res,"FCFS",input_d.endTime,originalProcesses, 0);
             }
             break;
         }
@@ -294,23 +301,22 @@ int main() {
 
             res = roundRobin(input_d.processes, input_d.endTime, input_d.algorithms.at(i).second); //will take last parameter and add it to trace/stats parameters to print it 
             if (input_d.mode.compare("trace") == 0){
-                //REMEMBER change the quantum lol
-                trace(res,"RR-1",input_d.endTime,input_d.processes);
+                trace(res,"RR",input_d.endTime,input_d.processes, input_d.algorithms.at(i).second);
             }
             else if(input_d.mode.compare("stats") == 0){
-                stats(res,"RR-1",input_d.endTime,input_d.processes);
+                stats(res,"RR",input_d.endTime,originalProcesses, input_d.algorithms.at(i).second);
             }
-            cout << "rr not implemented yet";
+            // cout << "rr not implemented yet";
             break;
 
         case ALG_SPN:        
         {
             res = SPN(input_d.processes, input_d.endTime);
             if (input_d.mode.compare("trace") == 0){
-                trace(res,"SPN",input_d.endTime,input_d.processes);
+                trace(res,"SPN",input_d.endTime,input_d.processes, 0);
             }
             else if(input_d.mode.compare("stats") == 0){
-                stats(res,"SPN",input_d.endTime,input_d.processes);
+                stats(res,"SPN",input_d.endTime,originalProcesses, 0);
             }
 
             break;
@@ -318,11 +324,11 @@ int main() {
         case ALG_SRT:
             res = shortestRemainingTime(input_d.processes, input_d.endTime);
             if (input_d.mode.compare("trace") == 0){
-                trace(res,"SRT",input_d.endTime, input_d.processes);
+                trace(res,"SRT",input_d.endTime, input_d.processes, 0);
                 
             }
             else if(input_d.mode.compare("stats") == 0){
-                stats(res,"SRT",input_d.endTime, originalProcesses);
+                stats(res,"SRT",input_d.endTime, originalProcesses, 0);
                 cout << input_d.processes.at(0).third_attribute << endl; //prints 0 for some unknown reason
                 cout << input_d.processes[0].third_attribute << endl; //prints 0 for some unknown reason
                 cout << originalProcesses.at(0).third_attribute << endl; //WORKING LOL
