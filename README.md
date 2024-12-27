@@ -13,3 +13,5 @@ NOTES:
 
 1. stats function needs modifications in white spaces
 2. WE NEED TO AUTOMATE TESTS SOMEHOW
+
+20/36 test cases passed
