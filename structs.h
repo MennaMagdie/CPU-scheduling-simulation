@@ -20,6 +20,7 @@ struct Process {
     int third_attribute; //priority:aging, service time:otherwise
     int leaveTime;
     bool inQueue = false;
+    int queueIndex = 0;
 };
 
 struct InputData { 

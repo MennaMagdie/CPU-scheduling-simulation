@@ -1,6 +1,7 @@
 #include "structs.h"
 #include "algorithms/round_robin.h"
 #include "algorithms/srt.h"
+#include "algorithms/fb1.h"
 
 enum Algorithm {
     ALG_FCFS = 1,
@@ -270,11 +271,10 @@ char* SPN(vector<Process> &processes, int endtime){
 int main() {
 
     InputData input_d = read_input();
-
     // cout << input_d.processes.at(3).third_attribute << endl; //working well LOL
 
-    // UNCOMMENT THIS FOR DEBUGGING
-    // debugInput(input_d);
+    
+    // debugInput(input_d); // UNCOMMENT THIS FOR DEBUGGING
 
     vector<Process> originalProcesses = input_d.processes; 
     char* res = nullptr; 
@@ -338,7 +338,14 @@ int main() {
             cout << "hrrn not implemented yet";
             break;
         case ALG_FB1:
-            cout << "fb1 not implemented yet";
+            // cout << "fb1 not implemented yet";
+            res = feedbackQueue(input_d.processes, input_d.endTime);
+            if (input_d.mode.compare("trace") == 0){
+                trace(res,"FB-1",input_d.endTime,input_d.processes, 0);
+            }
+            else if(input_d.mode.compare("stats") == 0){
+                stats(res,"FB-1",input_d.endTime,originalProcesses, 0);
+            }
             break;
         case ALG_FB2I:
             cout << "fb2i not implemented yet";
