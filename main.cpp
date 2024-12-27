@@ -2,6 +2,7 @@
 #include "algorithms/round_robin.h"
 #include "algorithms/srt.h"
 #include "algorithms/fb1.h"
+#include "algorithms/aging.h"
 
 enum Algorithm {
     ALG_FCFS = 1,
@@ -120,7 +121,7 @@ void trace(char* res, string mode, int endtime,vector<Process> processes, int qu
             cout<<" ";
 
         }
-        cout<<"|\n";
+        cout<<"| \n";
     }
     for(int i=0; i<= endtime*2 +7;i++){
         cout<<"-";
@@ -153,7 +154,7 @@ void stats(char* res, string mode, int endtime, vector<Process> processes, int q
         totalNormTurnaround += normTurnaroundTime[i];
     }
 
-    if(!quantum)
+    if (!quantum)
         cout << mode << endl;
     else
         cout << mode << "-" << quantum << endl;
@@ -162,26 +163,26 @@ void stats(char* res, string mode, int endtime, vector<Process> processes, int q
     cout << endl;
 
     cout << "Arrival    |";
-    for (const auto& p : processes) cout << "  " << p.arrivalTime << "  |";
+    for (const auto& p : processes) cout << " " << setw(2) << p.arrivalTime << "  |";
     cout << endl;
 
     cout << "Service    |";
-    for (const auto& p : processes) cout << "  " << p.third_attribute << "  |";
+    for (const auto& p : processes) cout << " " << setw(2) << p.third_attribute << "  |";
     cout << " Mean|" << endl;
 
     cout << "Finish     |";
-    for (int ft : finishTime) cout << "  " << ft << "  |";
+    for (int ft : finishTime) cout << " " << setw(2) << ft << "  |";
     cout << "-----|" << endl;
 
     cout << "Turnaround |";
-    for (int tat : turnaroundTime) cout << "  " << tat << "  |";
+    for (int tat : turnaroundTime) cout << " " << setw(2) << tat << "  |";
     cout << " " << fixed << setprecision(2) << totalTurnaround / n << "|" << endl;
 
     cout << "NormTurn   |";
     for (float ntat : normTurnaroundTime) cout << " " << fixed << setprecision(2) << ntat << "|";
     cout << " " << fixed << setprecision(2) << totalNormTurnaround / n << "|" << endl;
+    cout << endl;
 }
-
 
 
 
@@ -313,7 +314,7 @@ int main() {
         {
             res = SPN(input_d.processes, input_d.endTime);
             if (input_d.mode.compare("trace") == 0){
-                trace(res,"SPN",input_d.endTime,input_d.processes, 0);
+                trace(res,"SPN ",input_d.endTime,input_d.processes, 0);
             }
             else if(input_d.mode.compare("stats") == 0){
                 stats(res,"SPN",input_d.endTime,originalProcesses, 0);
@@ -324,14 +325,14 @@ int main() {
         case ALG_SRT:
             res = shortestRemainingTime(input_d.processes, input_d.endTime);
             if (input_d.mode.compare("trace") == 0){
-                trace(res,"SRT",input_d.endTime, input_d.processes, 0);
+                trace(res,"SRT ",input_d.endTime, input_d.processes, 0);
                 
             }
             else if(input_d.mode.compare("stats") == 0){
                 stats(res,"SRT",input_d.endTime, originalProcesses, 0);
-                cout << input_d.processes.at(0).third_attribute << endl; //prints 0 for some unknown reason
-                cout << input_d.processes[0].third_attribute << endl; //prints 0 for some unknown reason
-                cout << originalProcesses.at(0).third_attribute << endl; //WORKING LOL
+                // cout << input_d.processes.at(0).third_attribute << endl; //prints 0 for some unknown reason
+                // cout << input_d.processes[0].third_attribute << endl; //prints 0 for some unknown reason
+                // cout << originalProcesses.at(0).third_attribute << endl; //WORKING LOL
             }
             break;
         case ALG_HRRN:
@@ -351,7 +352,14 @@ int main() {
             cout << "fb2i not implemented yet";
             break;
         case ALG_AGING:
-            cout << "aging not implemented yet";
+            cout << "aging not implemented yet" << endl;
+            res = SPN(input_d.processes, input_d.endTime);
+            if (input_d.mode.compare("trace") == 0)
+                trace(res,"Aging",input_d.endTime,input_d.processes, 0);
+            
+            else if(input_d.mode.compare("stats") == 0)
+                stats(res,"Aging",input_d.endTime,originalProcesses, 0);
+            
             break;
         default:
             cout<<"Invalid algorithm";

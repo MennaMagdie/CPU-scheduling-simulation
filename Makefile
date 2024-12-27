@@ -1,19 +1,15 @@
-# WILL DO IT LATER..
+CXX = g++
+CXXFLAGS = -o main
 
-# FOR NOW TO COMPILE:
+SRC = main.cpp algorithms/round_robin.cpp algorithms/srt.cpp algorithms/fb1.cpp algorithms/aging.cpp
+TARGET = main
 
+all: $(TARGET)
 
-# 1) g++ main.cpp algorithms/round_robin.cpp -o main
+$(TARGET): $(SRC)
+	$(CXX) $(SRC) $(CXXFLAGS)
 
-
-#OR
-
-
-# 2) g++ -c round_robin.cpp -o round_robin.o
-# 	 g++ -c main.cpp -o main.o
-#	 g++ main.o round_robin.o -o main
-
-
+clean:
+	rm -f $(TARGET)
 
 # g++ -o main main.cpp algorithms/round_robin.cpp algorithms/srt.cpp algorithms/fb1.cpp
-

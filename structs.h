@@ -19,8 +19,10 @@ struct Process {
     int arrivalTime;
     int third_attribute; //priority:aging, service time:otherwise
     int leaveTime;
-    bool inQueue = false;
-    int queueIndex = 0;
+    bool inQueue = false; //for fb-1 && rr
+    int queueIndex = 0; //for fb-1
+    int priority; //for aging
+
 };
 
 struct InputData { 
