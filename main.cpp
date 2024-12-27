@@ -1,7 +1,11 @@
 #include "structs.h"
+#include "algorithms/FCFS.h"
 #include "algorithms/round_robin.h"
+#include "algorithms/SPN.h"
 #include "algorithms/srt.h"
+#include "algorithms/HRRN.h"
 #include "algorithms/fb1.h"
+#include "algorithms/fb2i.h"
 #include "algorithms/aging.h"
 
 enum Algorithm {
@@ -185,90 +189,6 @@ void stats(char* res, string mode, int endtime, vector<Process> processes, int q
 }
 
 
-
-/* POLICIES: to be removed to algorithms directory */
-
-char* FCFS(vector<Process> &processes, int endtime){
-
-    char* times = new char[endtime];
-    sort(processes.begin(), processes.end(), [](const Process& a, const Process& b) {
-        return a.arrivalTime < b.arrivalTime;
-    }); //from internet .. i think homa given sorted by arrival?
-    int count = 0;
-    for (int i=0; i<size(processes);i++){
-        if (count>endtime)
-        break;
-        if(processes.at(i).arrivalTime<=count){
-            for(int j=0; j<processes.at(i).third_attribute; j++){
-                times[count] = processes.at(i).name;
-                count++;
-            }
-            processes.at(i).leaveTime = count;
-        }
-    }
-    return times;
-}
-
-char* SPN(vector<Process> &processes, int endtime){
-    char* times = new char[endtime];
-    sort(processes.begin(), processes.end(), [](const Process& a, const Process& b) {
-        return a.third_attribute < b.third_attribute;
-    }); //from internet 
-    queue<Process*> smallbuthaventarrived; 
-    int count = 0;
-    for (int i=0; i<size(processes);i++){
-        if (count>endtime)
-        break;
-        if(processes.at(i).arrivalTime>count)
-        {smallbuthaventarrived.push(&processes.at(i));}
-        while(!smallbuthaventarrived.empty())
-            {
-                if(smallbuthaventarrived.front()->arrivalTime<=count)
-                {
-                    for(int j=0; j<smallbuthaventarrived.front()->third_attribute; j++)
-                    {
-                    times[count] = smallbuthaventarrived.front()->name;
-                    count++;
-                    }
-                smallbuthaventarrived.front()->leaveTime = count;
-                smallbuthaventarrived.pop();
-                }
-                else
-                break;
-            }
-        if(processes.at(i).arrivalTime<=count){
-            for(int j=0; j<processes.at(i).third_attribute; j++){
-                times[count] = processes.at(i).name;
-                count++;
-            }
-            processes.at(i).leaveTime = count;
-        }
-    }
-    while(!smallbuthaventarrived.empty())
-        {
-            if(smallbuthaventarrived.front()->arrivalTime<=count)
-            {
-                for(int j=0; j<smallbuthaventarrived.front()->third_attribute; j++)
-                {
-                times[count] = smallbuthaventarrived.front()->name;
-                count++;
-                }
-            smallbuthaventarrived.front()->leaveTime = count;
-            smallbuthaventarrived.pop();
-            }
-            else
-            {
-            times[count] = 0;
-            count++;
-            }
-        }
-    sort(processes.begin(), processes.end(), [](const Process& a, const Process& b) {
-        return a.arrivalTime < b.arrivalTime;
-    });
-    return times;
-}
-
-
 int main() {
 
     InputData input_d = read_input();
@@ -336,7 +256,17 @@ int main() {
             }
             break;
         case ALG_HRRN:
-            cout << "hrrn not implemented yet";
+        {
+            char* res = HRRN(input_d.processes, input_d.endTime);
+            if (input_d.mode.compare("trace") == 0){
+                trace(res,"HRRN",input_d.endTime,input_d.processes,0);
+            }
+            else if(input_d.mode.compare("stats") == 0){
+                stats(res,"HRRN",input_d.endTime,originalProcesses, 0);
+            }
+
+            break;
+        }
             break;
         case ALG_FB1:
             // cout << "fb1 not implemented yet";
