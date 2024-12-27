@@ -1,17 +1,15 @@
 #include "structs.h"
 #include "algorithms/round_robin.h"
-#include "algorithms/fcfs.h"
 #include "algorithms/srt.h"
-#include "algorithms/spn.h"
 
 enum Algorithm {
     ALG_FCFS = 1,
-    ALG_RR = 2,
-    ALG_SPN =3,
-    ALG_SRT = 4,
-    ALG_HRRN = 5,
-    ALG_FB1 = 6,
-    ALG_FB2I = 7,
+    ALG_RR,
+    ALG_SPN,
+    ALG_SRT, 
+    ALG_HRRN,
+    ALG_FB1,
+    ALG_FB2I,
     ALG_AGING
 };
 
@@ -66,7 +64,7 @@ void process_algorithms(const vector<string>& algorithm_tokens, vector<pair<int,
 InputData read_input() {
     InputData input_;
     cin >> input_.mode;
-
+    
     string all_algorithms;
     cin >> all_algorithms;
     vector<string> alg_tokens = split(all_algorithms, ',');
@@ -83,7 +81,7 @@ InputData read_input() {
         getline(cin, line);
         vector<string> tokens = split(line, ',');
 
-        processes[i].name = tokens[0][0];
+        processes[i].name = tokens[0][0]; 
         processes[i].arrivalTime = stoi(tokens[1]);
         processes[i].third_attribute = stoi(tokens[2]);
     }
@@ -93,6 +91,180 @@ InputData read_input() {
     return input_;
 }
 
+void trace(char* res, string mode, int endtime,vector<Process> processes, int quantum){
+    if(!quantum)
+        cout<<mode<<setw(3);
+    else
+        cout<<mode<<"-"<<quantum<<setw(3);
+    
+    for (int i=0; i<=endtime;i++){
+        cout<<i%10<<" ";
+    }
+    cout<<"\n";
+    for(int i=0; i<= endtime*2 +7;i++){
+        cout<<"-";
+    }
+    cout<<"\n";
+    for(int j=0;j<size(processes);j++){
+        cout<<processes.at(j).name<<setw(6);
+        for(int i=0; i<endtime;i++){
+            cout<<"|";
+            if(i<processes.at(j).arrivalTime)
+            cout<<" ";
+            else if(res[i]==processes.at(j).name)
+            cout<<"*";
+            else if(i<processes.at(j).leaveTime && res[i]!=processes.at(j).name)
+            cout<<".";
+            else if(i>=processes.at(j).leaveTime)
+            cout<<" ";
+
+        }
+        cout<<"|\n";
+    }
+    for(int i=0; i<= endtime*2 +7;i++){
+        cout<<"-";
+    }
+    cout << endl << endl;
+}
+
+
+void stats(char* res, string mode, int endtime, vector<Process> processes, int quantum) {
+    int n = processes.size();
+    vector<int> finishTime(n, -1);
+    vector<int> turnaroundTime(n, 0);
+    vector<float> normTurnaroundTime(n, 0.0);
+    float totalTurnaround = 0, totalNormTurnaround = 0;
+
+    // finish time
+    for (int i = 0; i < endtime; i++) {
+        for (int j = 0; j < n; j++) {
+            if (res[i] == processes[j].name) {
+                finishTime[j] = i + 1;
+            }
+        }
+    }
+
+    // turnaround and normalized turnaround
+    for (int i = 0; i < n; i++) {
+        turnaroundTime[i] = finishTime[i] - processes[i].arrivalTime;
+        normTurnaroundTime[i] = (float)turnaroundTime[i] / processes[i].third_attribute;
+        totalTurnaround += turnaroundTime[i];
+        totalNormTurnaround += normTurnaroundTime[i];
+    }
+
+    if(!quantum)
+        cout << mode << endl;
+    else
+        cout << mode << "-" << quantum << endl;
+    cout << "Process    |";
+    for (const auto& p : processes) cout << "  " << p.name << "  |";
+    cout << endl;
+
+    cout << "Arrival    |";
+    for (const auto& p : processes) cout << "  " << p.arrivalTime << "  |";
+    cout << endl;
+
+    cout << "Service    |";
+    for (const auto& p : processes) cout << "  " << p.third_attribute << "  |";
+    cout << " Mean|" << endl;
+
+    cout << "Finish     |";
+    for (int ft : finishTime) cout << "  " << ft << "  |";
+    cout << "-----|" << endl;
+
+    cout << "Turnaround |";
+    for (int tat : turnaroundTime) cout << "  " << tat << "  |";
+    cout << " " << fixed << setprecision(2) << totalTurnaround / n << "|" << endl;
+
+    cout << "NormTurn   |";
+    for (float ntat : normTurnaroundTime) cout << " " << fixed << setprecision(2) << ntat << "|";
+    cout << " " << fixed << setprecision(2) << totalNormTurnaround / n << "|" << endl;
+}
+
+
+
+
+/* POLICIES: to be removed to algorithms directory */
+
+char* FCFS(vector<Process> &processes, int endtime){
+
+    char* times = new char[endtime];
+    sort(processes.begin(), processes.end(), [](const Process& a, const Process& b) {
+        return a.arrivalTime < b.arrivalTime;
+    }); //from internet .. i think homa given sorted by arrival?
+    int count = 0;
+    for (int i=0; i<size(processes);i++){
+        if (count>endtime)
+        break;
+        if(processes.at(i).arrivalTime<=count){
+            for(int j=0; j<processes.at(i).third_attribute; j++){
+                times[count] = processes.at(i).name;
+                count++;
+            }
+            processes.at(i).leaveTime = count;
+        }
+    }
+    return times;
+}
+
+char* SPN(vector<Process> &processes, int endtime){
+    char* times = new char[endtime];
+    sort(processes.begin(), processes.end(), [](const Process& a, const Process& b) {
+        return a.third_attribute < b.third_attribute;
+    }); //from internet 
+    queue<Process*> smallbuthaventarrived; 
+    int count = 0;
+    for (int i=0; i<size(processes);i++){
+        if (count>endtime)
+        break;
+        if(processes.at(i).arrivalTime>count)
+        {smallbuthaventarrived.push(&processes.at(i));}
+        while(!smallbuthaventarrived.empty())
+            {
+                if(smallbuthaventarrived.front()->arrivalTime<=count)
+                {
+                    for(int j=0; j<smallbuthaventarrived.front()->third_attribute; j++)
+                    {
+                    times[count] = smallbuthaventarrived.front()->name;
+                    count++;
+                    }
+                smallbuthaventarrived.front()->leaveTime = count;
+                smallbuthaventarrived.pop();
+                }
+                else
+                break;
+            }
+        if(processes.at(i).arrivalTime<=count){
+            for(int j=0; j<processes.at(i).third_attribute; j++){
+                times[count] = processes.at(i).name;
+                count++;
+            }
+            processes.at(i).leaveTime = count;
+        }
+    }
+    while(!smallbuthaventarrived.empty())
+        {
+            if(smallbuthaventarrived.front()->arrivalTime<=count)
+            {
+                for(int j=0; j<smallbuthaventarrived.front()->third_attribute; j++)
+                {
+                times[count] = smallbuthaventarrived.front()->name;
+                count++;
+                }
+            smallbuthaventarrived.front()->leaveTime = count;
+            smallbuthaventarrived.pop();
+            }
+            else
+            {
+            times[count] = 0;
+            count++;
+            }
+        }
+    sort(processes.begin(), processes.end(), [](const Process& a, const Process& b) {
+        return a.arrivalTime < b.arrivalTime;
+    });
+    return times;
+}
 
 
 int main() {
@@ -104,10 +276,10 @@ int main() {
     // UNCOMMENT THIS FOR DEBUGGING
     // debugInput(input_d);
 
-    vector<Process> originalProcesses = input_d.processes;
-    char* res = nullptr;
+    vector<Process> originalProcesses = input_d.processes; 
+    char* res = nullptr; 
 
-    for (int i =0; i<sizeof(input_d.algorithms); i++){
+    for (int i =0; i<size(input_d.algorithms); i++){
 
         input_d.processes = originalProcesses;
 
@@ -127,7 +299,7 @@ int main() {
         }
         case ALG_RR:
 
-            res = roundRobin(input_d.processes, input_d.endTime, input_d.algorithms.at(i).second); //will take last parameter and add it to trace/stats parameters to print it
+            res = roundRobin(input_d.processes, input_d.endTime, input_d.algorithms.at(i).second); //will take last parameter and add it to trace/stats parameters to print it 
             if (input_d.mode.compare("trace") == 0){
                 trace(res,"RR",input_d.endTime,input_d.processes, input_d.algorithms.at(i).second);
             }
@@ -137,7 +309,7 @@ int main() {
             // cout << "rr not implemented yet";
             break;
 
-        case ALG_SPN:
+        case ALG_SPN:        
         {
             res = SPN(input_d.processes, input_d.endTime);
             if (input_d.mode.compare("trace") == 0){
@@ -153,7 +325,7 @@ int main() {
             res = shortestRemainingTime(input_d.processes, input_d.endTime);
             if (input_d.mode.compare("trace") == 0){
                 trace(res,"SRT",input_d.endTime, input_d.processes, 0);
-
+                
             }
             else if(input_d.mode.compare("stats") == 0){
                 stats(res,"SRT",input_d.endTime, originalProcesses, 0);
