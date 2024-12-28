@@ -100,8 +100,13 @@ InputData read_input() {
 void trace(char* res, string mode, int endtime,vector<Process> processes, int quantum){
     if(!quantum)
         cout<<mode<<setw(3);
-    else
-        cout<<mode<<"-"<<quantum<<setw(3);
+    else {
+        if(mode == "Aging")
+            cout<<mode<<setw(2);
+        else 
+            cout<<mode<<"-"<<quantum<<setw(3);
+    }
+        
     
     for (int i=0; i<=endtime;i++){
         cout<<i%10<<" ";
@@ -114,16 +119,17 @@ void trace(char* res, string mode, int endtime,vector<Process> processes, int qu
     for(int j=0;j<size(processes);j++){
         cout<<processes.at(j).name<<setw(6);
         for(int i=0; i<endtime;i++){
-            cout<<"|";
-            if(i<processes.at(j).arrivalTime)
-            cout<<" ";
-            else if(res[i]==processes.at(j).name)
-            cout<<"*";
-            else if(i<processes.at(j).leaveTime && res[i]!=processes.at(j).name)
-            cout<<".";
-            else if(i>=processes.at(j).leaveTime)
-            cout<<" ";
-
+            cout << "|";
+            if (i < processes.at(j).arrivalTime)
+                cout << " ";
+            else if (res[i] == processes.at(j).name)
+                cout << "*";
+            else if (i < processes.at(j).leaveTime && res[i] != processes.at(j).name)
+                cout << ".";
+            else if (i >= processes.at(j).arrivalTime && mode == "Aging")
+                    cout << ".";
+            else if (i >= processes.at(j).leaveTime)
+                    cout << " ";
         }
         cout<<"| \n";
     }
@@ -282,13 +288,13 @@ int main() {
             cout << "fb2i not implemented yet";
             break;
         case ALG_AGING:
-            cout << "aging not implemented yet" << endl;
-            res = SPN(input_d.processes, input_d.endTime);
+            // cout << "aging not implemented yet" << endl;
+            res = aging(input_d.processes, input_d.endTime, input_d.algorithms.at(i).second);
             if (input_d.mode.compare("trace") == 0)
-                trace(res,"Aging",input_d.endTime,input_d.processes, 0);
+                trace(res,"Aging",input_d.endTime,input_d.processes, input_d.algorithms.at(i).second);
             
             else if(input_d.mode.compare("stats") == 0)
-                stats(res,"Aging",input_d.endTime,originalProcesses, 0);
+                stats(res,"Aging",input_d.endTime,originalProcesses, input_d.algorithms.at(i).second);
             
             break;
         default:

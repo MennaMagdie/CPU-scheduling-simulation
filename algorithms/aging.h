@@ -2,5 +2,5 @@
 #define AGING_H
 #include "../structs.h"
 
-char* aging(vector<Process>& processes, int endTime);
+char* aging(vector<Process>& processes, int endTime, int quantum);
 #endif

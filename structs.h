@@ -22,6 +22,7 @@ struct Process {
     bool inQueue = false; //for fb-1 && rr
     int queueIndex = 0; //for fb-1
     int priority; //for aging
+    int lastExecuted;
 
 };
 

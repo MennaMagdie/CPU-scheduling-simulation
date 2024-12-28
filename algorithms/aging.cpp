@@ -1,39 +1,48 @@
 #include "aging.h"
 
-char* aging(vector<Process>& processes, int endTime) {
+char* aging(vector<Process>& processes, int endTime, int quantum) {
     char* times = new char[endTime];
-    memset(times, '_', endTime); // Represent idle CPU time with '_'
+    memset(times, '_', endTime);
 
-    int currentTime = 0;
-    vector<Process*> readyQueue;
+    vector<Process*> readyQueue; 
 
-    while (currentTime < endTime) {
-        // Add new processes to the ready queue when their arrival time comes
+    for (int currentTime = 0; currentTime < endTime; currentTime++) {
+        
         for (auto& process : processes) {
             if (process.arrivalTime == currentTime) {
+                process.priority = process.third_attribute;
+                process.lastExecuted = -1;  
                 readyQueue.push_back(&process);
             }
         }
 
         if (!readyQueue.empty()) {
-            // Select process with the highest priority (ageing may have increased priorities)
-            auto it = max_element(readyQueue.begin(), readyQueue.end(), [](Process* a, Process* b) {
-                return a->priority < b->priority;
-            });
 
-            Process* currentProcess = *it;
-            times[currentTime] = currentProcess->name; // Mark the process that runs
-
-            // Aging: Increment priority of all ready processes (except the current one)
+            Process* highestPriorityProcess = nullptr;
             for (auto& process : readyQueue) {
-                if (process != currentProcess) {
+                if (highestPriorityProcess == nullptr || process->priority > highestPriorityProcess->priority) {
+                    highestPriorityProcess = process;
+                }
+                else if (process->priority == highestPriorityProcess->priority) {
+                    if (process->lastExecuted < highestPriorityProcess->lastExecuted) {
+                        highestPriorityProcess = process;
+                    }
+                }
+            }
+
+            Process* selectedProcess = highestPriorityProcess;
+
+            times[currentTime] = selectedProcess->name;
+            selectedProcess->lastExecuted = currentTime;
+            selectedProcess->priority = selectedProcess->third_attribute;
+
+            for (auto& process : readyQueue) {
+                if (process != selectedProcess) {
                     process->priority++;
                 }
             }
         }
 
-        // Move to next time unit
-        currentTime++;
     }
 
     return times;
