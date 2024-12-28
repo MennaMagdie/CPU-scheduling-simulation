@@ -14,6 +14,7 @@ clean:
 
 # g++ -o main main.cpp algorithms/round_robin.cpp algorithms/srt.cpp algorithms/fb1.cpp
 
-
+test: all
+	bash ./run_tests.sh
 
 

@@ -186,7 +186,14 @@ void stats(char* res, string mode, int endtime, vector<Process> processes, int q
 
     cout << "Turnaround |";
     for (int tat : turnaroundTime) cout << " " << setw(2) << tat << "  |";
-    cout << " " << fixed << setprecision(2) << totalTurnaround / n << "|" << endl;
+    // float t_a_m = totalTurnaround / n;
+    double result = totalTurnaround / n;
+    if (result >= 10 && result < 100) {
+        cout << fixed << setprecision(2) << totalTurnaround / n << "|" << endl;
+    } else if (result >= 0 && result < 10) {
+        cout << " " << fixed << setprecision(2) << totalTurnaround / n << "|" << endl;
+    }
+    
 
     cout << "NormTurn   |";
     for (float ntat : normTurnaroundTime) cout << " " << fixed << setprecision(2) << ntat << "|";
