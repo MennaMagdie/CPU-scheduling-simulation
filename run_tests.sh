@@ -11,7 +11,7 @@ for input_file in "$TEST_DIR"/*-input.txt; do
     base_name=$(basename "$input_file" -input.txt)
     expected_output_file="$TEST_DIR/${base_name}-output.txt"
 
-    diff_output=$(cat "$input_file" | ./main | diff - "$expected_output_file")
+    diff_output=$(cat "$input_file" | ./lab6 | diff - "$expected_output_file")
     
     if [ $? -eq 0 ]; then
         echo "Test $base_name: PASSED"

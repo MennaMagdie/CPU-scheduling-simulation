@@ -1,8 +1,8 @@
 CXX = g++
-CXXFLAGS = -o main
+CXXFLAGS = -o lab6
 
 SRC = main.cpp algorithms/round_robin.cpp algorithms/srt.cpp algorithms/fb1.cpp algorithms/aging.cpp algorithms/HRRN.cpp algorithms/FCFS.cpp algorithms/SPN.cpp algorithms/fb2i.cpp
-TARGET = main
+TARGET = lab6
 
 all: $(TARGET)
 
