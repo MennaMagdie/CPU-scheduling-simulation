@@ -5,13 +5,14 @@ char* aging(vector<Process>& processes, int endTime, int quantum) {
     memset(times, '_', endTime);
 
     vector<Process*> readyQueue; 
+    Process* prevProcess = nullptr;
 
     for (int currentTime = 0; currentTime < endTime; currentTime++) {
         
         for (auto& process : processes) {
             if (process.arrivalTime == currentTime) {
                 process.priority = process.third_attribute;
-                process.lastExecuted = -1;  
+                process.lastExecuted = currentTime;  
                 readyQueue.push_back(&process);
             }
         }
@@ -20,6 +21,10 @@ char* aging(vector<Process>& processes, int endTime, int quantum) {
 
             Process* highestPriorityProcess = nullptr;
             for (auto& process : readyQueue) {
+                if(process != prevProcess) {
+                    process->priority++;
+                    // cout <<" t = " << currentTime << " | "<< process->name <<" = "<< process->priority << endl;
+                }
                 if (highestPriorityProcess == nullptr || process->priority > highestPriorityProcess->priority) {
                     highestPriorityProcess = process;
                 }
@@ -33,14 +38,15 @@ char* aging(vector<Process>& processes, int endTime, int quantum) {
             Process* selectedProcess = highestPriorityProcess;
 
             times[currentTime] = selectedProcess->name;
-            selectedProcess->lastExecuted = currentTime;
+            selectedProcess->lastExecuted = currentTime + 1;
             selectedProcess->priority = selectedProcess->third_attribute;
+            prevProcess = selectedProcess;
 
-            for (auto& process : readyQueue) {
-                if (process != selectedProcess) {
-                    process->priority++;
-                }
-            }
+            // for (auto& process : readyQueue) {
+            //     if (process != selectedProcess) {
+            //         process->priority++;
+            //     }
+            // }
         }
 
     }

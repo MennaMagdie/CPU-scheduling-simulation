@@ -14,7 +14,7 @@ multiple processes test cases passed: 7c, 7d
 
 NOTES:
 
-1. stats function needs modifications in white spaces "2b 3b 3d 7b 7d 9b fail in diff command" - problem in spaces of the last number in turnaround
-2. WE NEED TO AUTOMATE TESTS SOMEHOW (meen al el kalam da? :') => la ana 3ady xD)
+1. stats function needs modifications in white spaces "2b 3b 3d 7b 7d 9b fail in diff command" - problem in spaces of the last number in turnaround (DONE)
+2. WE NEED TO AUTOMATE TESTS SOMEHOW (meen al el kalam da? :') (DONE)
 
-30/36 test cases passed
+32/36 test cases passed

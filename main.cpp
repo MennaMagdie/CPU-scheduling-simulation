@@ -292,7 +292,7 @@ int main() {
             }
             break;
         case ALG_FB2I:
-            cout << "fb2i not implemented yet";
+            // cout << "fb2i not implemented yet";
             break;
         case ALG_AGING:
             // cout << "aging not implemented yet" << endl;
