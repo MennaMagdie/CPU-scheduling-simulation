@@ -7,14 +7,14 @@ Algorithms Implemented so far
 4. SRT "testcases passed: 5a, 5c, 5b, 5d"
 5. HHRN "testcases passes: 6a 6b 6c 6d"
 6. FB-1 "testcases passed: 7a, 7b"
-7.
-8. Aging "testcases passed: 12a" (11a lessa basbens2al elmo3ideen 3aleh 3shan ana w kaza had mtala3eeno haga mokhtalefa)
+7. FB-2i "testcases passed: 8a, 8b"
+8. Aging "testcases passed: 11a, 12a"
 
-multiple processes test cases passed: 7c, 7d
+multiple processes test cases passed: 7c, 7d, 10a, 10b
 
 NOTES:
 
 1. stats function needs modifications in white spaces "2b 3b 3d 7b 7d 9b fail in diff command" - problem in spaces of the last number in turnaround (DONE)
 2. WE NEED TO AUTOMATE TESTS SOMEHOW (meen al el kalam da? :') (DONE)
 
-32/36 test cases passed
+36/36 test cases passed (woohoo)

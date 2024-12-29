@@ -98,15 +98,14 @@ InputData read_input() {
 }
 
 void trace(char* res, string mode, int endtime,vector<Process> processes, int quantum){
-    if(!quantum)
+    if(!quantum && mode !="FB-2i")
         cout<<mode<<setw(3);
     else {
-        if(mode == "Aging")
+        if(mode == "Aging" || mode == "FB-2i")
             cout<<mode<<setw(2);
         else 
             cout<<mode<<"-"<<quantum<<setw(3);
     }
-        
     
     for (int i=0; i<=endtime;i++){
         cout<<i%10<<" ";
@@ -292,7 +291,17 @@ int main() {
             }
             break;
         case ALG_FB2I:
-            // cout << "fb2i not implemented yet";
+        {
+            char* res = feedbackQueue2i(input_d.processes, input_d.endTime);
+            if (input_d.mode.compare("trace") == 0){
+                trace(res,"FB-2i",input_d.endTime,input_d.processes,0);
+            }
+            else if(input_d.mode.compare("stats") == 0){
+                stats(res,"FB-2i",input_d.endTime,originalProcesses, 0);
+            }
+
+            break;
+        }
             break;
         case ALG_AGING:
             // cout << "aging not implemented yet" << endl;

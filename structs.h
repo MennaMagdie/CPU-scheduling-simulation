@@ -23,6 +23,7 @@ struct Process {
     int queueIndex = 0; //for fb-1
     int priority; //for aging
     int lastExecuted;
+    int amountfinished;
 
 };
 
