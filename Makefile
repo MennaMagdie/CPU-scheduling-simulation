@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -o lab6
+CXXFLAGS = -std=c++17
 
 SRC = main.cpp algorithms/round_robin.cpp algorithms/srt.cpp algorithms/fb1.cpp algorithms/aging.cpp algorithms/HRRN.cpp algorithms/FCFS.cpp algorithms/SPN.cpp algorithms/fb2i.cpp
 TARGET = lab6
@@ -7,14 +7,12 @@ TARGET = lab6
 all: $(TARGET)
 
 $(TARGET): $(SRC)
-	$(CXX) $(SRC) $(CXXFLAGS)
+	$(CXX) $(SRC) $(CXXFLAGS) -o $(TARGET)
 
 clean:
 	rm -f $(TARGET)
 
-# g++ -o main main.cpp algorithms/round_robin.cpp algorithms/srt.cpp algorithms/fb1.cpp
-
 test: all
 	bash ./run_tests.sh
 
-
+.PHONY: all clean test
