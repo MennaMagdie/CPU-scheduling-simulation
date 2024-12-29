@@ -5,7 +5,7 @@ char *HRRN(vector<Process> &processes, int endTime)
     char* times = new char[endTime];
     sort(processes.begin(), processes.end(), [](const Process& a, const Process& b) {
         return a.arrivalTime < b.arrivalTime;
-    }); //from internet 
+    }); 
     int count = 0;
     int ratio[size(processes)];
     for(int j=0; j<processes.at(0).third_attribute; j++)

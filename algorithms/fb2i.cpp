@@ -3,6 +3,9 @@
 char *feedbackQueue2i(vector<Process> &processes, int endTime)
 {
     char *times = new char[endTime];
+    sort(processes.begin(), processes.end(), [](const Process& a, const Process& b) {
+        return a.arrivalTime < b.arrivalTime;
+    });
     memset(times, '_', endTime);
     vector<queue<Process *>> feedbackQueues2i;
     int count = 0;

@@ -4,7 +4,7 @@ char* SPN(std::vector<Process> &processes, int endtime){
     char* times = new char[endtime];
     sort(processes.begin(), processes.end(), [](const Process& a, const Process& b) {
         return a.third_attribute < b.third_attribute;
-    }); //from internet 
+    });
     queue<Process*> smallbuthaventarrived; 
     int count = 0;
     for (int i=0; i<size(processes);i++){

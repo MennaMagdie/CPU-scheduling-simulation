@@ -39,7 +39,7 @@ void debugInput(InputData input_d) {
     cout << endl;
 };
 
-//split function taken from the internet :)))
+//split function
 vector<string> split(const string &str, char delimiter) {
     vector<string> tokens;
     stringstream ss(str);
@@ -281,7 +281,6 @@ int main() {
         }
             break;
         case ALG_FB1:
-            // cout << "fb1 not implemented yet";
             res = feedbackQueue(input_d.processes, input_d.endTime);
             if (input_d.mode.compare("trace") == 0){
                 trace(res,"FB-1",input_d.endTime,input_d.processes, 0);
@@ -304,7 +303,6 @@ int main() {
         }
             break;
         case ALG_AGING:
-            // cout << "aging not implemented yet" << endl;
             res = aging(input_d.processes, input_d.endTime, input_d.algorithms.at(i).second);
             if (input_d.mode.compare("trace") == 0)
                 trace(res,"Aging",input_d.endTime,input_d.processes, input_d.algorithms.at(i).second);
